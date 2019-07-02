@@ -1,0 +1,38 @@
+version: '3'
+
+services: 
+  nginx:
+    build: './nginx-pagespeed'
+    restart: always
+    env_file: './nginx-pagespeed/.env'
+    ports:
+    - '80:80'
+    - '443:443'
+    volumes:
+    - /home/bitrix/nginx/sites-available:/etc/nginx/sites-available
+    - /home/bitrix/nginx/sites-enabled:/etc/nginx/sites-enabled
+    - /home/bitrix/ssl:/etc/nginx/ssl
+    - /home/bitrix/www:/var/www/html
+  php-fpm:
+    build: './php-7.1-fpm'
+    restart: always
+    volumes:
+    - /home/bitrix/www:/var/www/html
+    - /home/bitrix/mail/msmtprc:/etc/msmtprc
+  memcached:
+    image: 'memcached:1.5'
+    restart: always
+  mysql:
+    build: './mysql-5.7'
+    restart: always
+    environment: 
+      # Указываем пароль для mysql
+      MYSQL_ROOT_PASSWORD: 'bitrix-admin'
+      # MYSQL_DATABASE: 'bitrix-db'
+      # MYSQL_USER: 'bitrix-db-user'
+      # MYSQL_PASSWORD: 'bitrix-db-password'
+    volumes:
+    - /home/bitrix/mysql:/var/lib/mysql
+    # for restoring databases
+    - /home/bitrix/www:/var/www/html
+

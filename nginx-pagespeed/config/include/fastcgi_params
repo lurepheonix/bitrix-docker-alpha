@@ -1,0 +1,13 @@
+# PHP only, required if PHP was built with --enable-force-cgi-redirect
+fastcgi_param  REDIRECT_STATUS              200;
+
+# common line so we dont have to include it on every vhost
+fastcgi_param  SCRIPT_FILENAME              $document_root$fastcgi_script_name;
+
+# https://www.namhuy.net/3120/fix-nginx-upstream-response-buffered-temporary-file-error.html
+fastcgi_buffer_size                        32k;
+fastcgi_buffers                        256 16k;
+fastcgi_index                        index.php;
+
+# help PHP recognize HTTPS protocol behind proxy
+fastcgi_param    HTTPS $php_https;
