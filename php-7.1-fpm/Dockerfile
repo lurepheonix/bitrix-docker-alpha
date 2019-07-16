@@ -6,7 +6,16 @@ RUN apt-get update && apt-get install -y \
         libpng-dev \
         libicu-dev \
         libpq-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+        patch
+
+# Patch for pkg-config
+ADD https://git.archlinux.org/svntogit/packages.git/plain/trunk/freetype.patch?h=packages/php /tmp/freetype.patch
+RUN docker-php-source extract; \
+  cd /usr/src/php; \
+  patch -p1 -i /tmp/freetype.patch; \
+  rm /tmp/freetype.patch
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install -j$(nproc) mysqli \
     && docker-php-ext-install -j$(nproc) pdo_mysql \
