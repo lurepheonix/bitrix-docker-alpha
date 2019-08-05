@@ -26,20 +26,21 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 
 RUN apt-get install -y msmtp
 
-RUN sed -i 's/; max_input_vars = 1000/max_input_vars = 10000/g' /usr/local/etc/php/php.ini-production \
+RUN sed -i 's/; max_input_vars = 1000/max_input_vars = 40000/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's/short_open_tag = Off/short_open_tag = On/g' /usr/local/etc/php/php.ini-production \
-    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 1024M/g' /usr/local/etc/php/php.ini-production \
-    && sed -i 's/post_max_size = 8M/post_max_size = 1024M/g' /usr/local/etc/php/php.ini-production \
+    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 4095M/g' /usr/local/etc/php/php.ini-production \
+    && sed -i 's/post_max_size = 8M/post_max_size = 4095M/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's/;mbstring.internal_encoding =/mbstring.internal_encoding = utf-8/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's/;realpath_cache_size = 4096k/realpath_cache_size = 4096k/g' /usr/local/etc/php/php.ini-production \
-    && sed -i 's/;pcre.backtrack_limit=100000/pcre.backtrack_limit=100000/g' /usr/local/etc/php/php.ini-production \
-    && sed -i 's/;pcre.recursion_limit=100000/pcre.recursion_limit=100000/g' /usr/local/etc/php/php.ini-production \
+    && sed -i 's/;pcre.backtrack_limit=100000/pcre.backtrack_limit=400000/g' /usr/local/etc/php/php.ini-production \
+    && sed -i 's/;pcre.recursion_limit=100000/pcre.recursion_limit=400000/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's/;pcre.jit=1/pcre.jit=1/g' /usr/local/etc/php/php.ini-production \
     && sed -i 's|;sendmail_path =|sendmail_path = "/usr/bin/msmtp -t"|g' /usr/local/etc/php/php.ini-production \
+    && echo "date.timezone = Europe/Kaliningrad" >> /usr/local/etc/php/php.ini-production \
     && echo "mbstring.func_overload = 2" >> /usr/local/etc/php/php.ini-production \
     && echo "opcache.revalidate_freq = 0" >> /usr/local/etc/php/php.ini-production
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
-RUN echo "* * * * * www-data php /var/www/html/bitrix/modules/main/tools/cron_events.php" >> /etc/crontab
+RUN echo "* * * * * www-data php -f /var/www/html/bitrix/modules/main/tools/cron_events.php" >> /etc/crontab
